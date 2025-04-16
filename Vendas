@@ -1,0 +1,92 @@
+import React, { useState } from "react"; import { Button } from "@/components/ui/button"; import { Card, CardContent } from "@/components/ui/card"; import { ShoppingCart, Trash2 } from "lucide-react";
+
+const products = [ { id: 1, name: "Body Splash - Victoria's Secret Love Spell", price: 89.9, image: "https://example.com/love-spell.jpg", }, { id: 2, name: "Body Lotion - Victoria's Secret Pure Seduction", price: 99.9, image: "https://example.com/pure-seduction.jpg", }, { id: 3, name: "Perfume - Victoria's Secret Bombshell", price: 149.9, image: "https://example.com/bombshell.jpg", }, ];
+
+export default function VitoriaSecretsSite() { const [cart, setCart] = useState([]); const [step, setStep] = useState("shop"); const [form, setForm] = useState({ name: "", address: "" });
+
+const addToCart = (product) => { setCart((prev) => [...prev, product]); };
+
+const removeFromCart = (index) => { setCart((prev) => prev.filter((_, i) => i !== index)); };
+
+const totalWithPromo = () => { const count = cart.length; const freeItems = Math.floor(count / 3); const sortedCart = [...cart].sort((a, b) => a.price - b.price); return sortedCart .slice(freeItems) .reduce((acc, item) => acc + item.price, 0) .toFixed(2); };
+
+const handleInputChange = (e) => { setForm({ ...form, [e.target.name]: e.target.value }); };
+
+if (step === "checkout") { return ( <div className="bg-pink-50 min-h-screen p-6"> <h1 className="text-3xl font-bold text-pink-700 mb-4">Finalizar Compra</h1> <form onSubmit={(e) => { e.preventDefault(); setStep("done"); }} className="max-w-md mx-auto space-y-4" > <input
+type="text"
+name="name"
+placeholder="Nome Completo"
+required
+value={form.name}
+onChange={handleInputChange}
+className="w-full p-2 border rounded-xl"
+/> <input
+type="text"
+name="address"
+placeholder="Endereço Completo"
+required
+value={form.address}
+onChange={handleInputChange}
+className="w-full p-2 border rounded-xl"
+/> <Button className="bg-pink-600 hover:bg-pink-700 text-white w-full"> Confirmar Pedido </Button> </form> </div> ); }
+
+if (step === "done") { return ( <div className="bg-pink-100 min-h-screen p-6 text-center"> <h1 className="text-3xl font-bold text-pink-700">Obrigado pela sua compra!</h1> <p className="text-lg text-pink-600 mt-4"> Seu pedido será enviado para: {form.name}, {form.address} </p> </div> ); }
+
+return ( <div className="bg-pink-100 min-h-screen p-6"> <h1 className="text-4xl font-bold text-pink-700 mb-4 text-center"> Promoção Victoria's Secret! </h1> <p className="text-lg text-pink-600 text-center"> Frete grátis para todo o Brasil! Compre 2 e leve o 3º GRÁTIS! </p>
+
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+    {products.map((product) => (
+      <Card key={product.id} className="bg-white shadow-xl rounded-2xl">
+        <CardContent className="p-4">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-60 object-cover rounded-xl mb-4"
+          />
+          <h2 className="text-xl font-bold text-pink-700 mb-2">
+            {product.name}
+          </h2>
+          <p className="text-lg text-gray-700 mb-4">R$ {product.price.toFixed(2)}</p>
+          <Button
+            onClick={() => addToCart(product)}
+            className="bg-pink-600 hover:bg-pink-700 text-white w-full"
+          >
+            <ShoppingCart className="mr-2 h-4 w-4" /> Comprar
+          </Button>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+
+  {cart.length > 0 && (
+    <div className="bg-white mt-10 p-6 rounded-2xl shadow-md">
+      <h2 className="text-2xl font-bold text-pink-700 mb-4">Carrinho</h2>
+      {cart.map((item, index) => (
+        <div
+          key={index}
+          className="flex justify-between items-center mb-2 border-b pb-2"
+        >
+          <span>{item.name}</span>
+          <div className="flex items-center gap-2">
+            <span>R$ {item.price.toFixed(2)}</span>
+            <button onClick={() => removeFromCart(index)}>
+              <Trash2 className="text-red-500 hover:text-red-700" />
+            </button>
+          </div>
+        </div>
+      ))}
+      <div className="text-right font-bold text-pink-800 text-xl mt-4">
+        Total: R$ {totalWithPromo()}
+      </div>
+      <Button
+        onClick={() => setStep("checkout")}
+        className="mt-4 w-full bg-pink-600 hover:bg-pink-700 text-white"
+      >
+        Finalizar Compra
+      </Button>
+    </div>
+  )}
+</div>
+
+); }
+
